@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body id="body" style="margin:0;display:flex;background:#111827;color:white;font-family:Arial;">
+
+<div id="sidebar" style="width:250px;background:#1f2937;padding:20px;">
+<h2>🍰 Smart Bakery</h2>
+<a href="/dashboard" style="display:block;color:white;margin:15px 0;">Dashboard</a>
+<a href="/" style="display:block;color:white;margin:15px 0;">POS</a>
+<a href="/logout" style="color:#f87171;">Logout</a>
+<hr>
+<select onchange="changeTheme(this.value)" style="width:100%;padding:8px;">
+<option value="dark">Dark</option>
+<option value="light">Light</option>
+<option value="pastel">Pastel</option>
+<option value="purple">Purple</option>
+</select>
+</div>
+
+<div style="flex:1;padding:30px;">
+<h1>Dashboard</h1>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap;">
+<div style="flex:1;background:#1f2937;padding:20px;border-radius:12px;">
+<h3>Total Sales</h3>
+<h1><%= totalSales %> RWF</h1>
+</div>
+<div style="flex:1;background:#1f2937;padding:20px;border-radius:12px;">
+<h3>Customers</h3>
+<h1><%= totalCustomers %></h1>
+</div>
+<div style="flex:1;background:#1f2937;padding:20px;border-radius:12px;">
+<h3>Products</h3>
+<h1><%= totalProducts %></h1>
+</div>
+</div>
+
+<canvas id="chart" style="margin-top:40px;"></canvas>
+
+<script src="/app.js"></script>
+<script>
+new Chart(document.getElementById('chart'),{
+type:'bar',
+data:{
+labels:['Sales'],
+datasets:[{label:'Total Sales',data:[<%= totalSales %>]}]
+}
+});
+</script>
+</div>
+</body>
+</html>

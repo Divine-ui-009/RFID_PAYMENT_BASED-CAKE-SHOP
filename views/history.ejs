@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title>Bakery OS | Transactions</title></head>
+<body>
+    <%- include('partials/nav') %>
+    <div style="padding: 40px;">
+        <h1>Transaction History</h1>
+        <div style="background: var(--surface); border-radius: 15px; border: 1px solid var(--border); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: rgba(0,0,0,0.05); border-bottom: 1px solid var(--border);">
+                    <tr><th style="padding: 15px;">Date & Time</th><th style="padding: 15px;">Type</th><th style="padding: 15px;">Amount</th><th style="padding: 15px;">Details / Items</th><th style="padding: 15px;">UID</th></tr>
+                </thead>
+                <tbody>
+                    <% logs.forEach(l => { %>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 15px; color: var(--text-muted);"><%= new Date(l.time).toLocaleString() %></td>
+                            <td style="padding: 15px;">
+                                <span style="background: <%= l.type === 'TOPUP' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)' %>; color: <%= l.type === 'TOPUP' ? '#10b981' : '#ef4444' %>; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">
+                                    <%= l.type %>
+                                </span>
+                            </td>
+                            <td style="padding: 15px; font-weight: bold;">$<%= l.amount.toFixed(2) %></td>
+                            <td style="padding: 15px;"><%= l.details %></td>
+                            <td style="padding: 15px; color: var(--text-muted); font-size: 0.9rem;"><code><%= l.rfid_uid %></code></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

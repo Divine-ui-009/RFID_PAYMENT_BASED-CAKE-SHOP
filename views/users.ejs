@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Bakery OS | Customers</title></head>
+<body>
+    <%- include('partials/nav') %>
+    <div style="padding: 40px;">
+        <h1>Registered Customers</h1>
+        <div style="background: var(--surface); border-radius: 15px; border: 1px solid var(--border); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: rgba(0,0,0,0.05); border-bottom: 1px solid var(--border);">
+                    <tr><th style="padding: 15px;">Name</th><th style="padding: 15px;">RFID UID</th><th style="padding: 15px;">Current Balance</th></tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(u => { %>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 15px; font-weight: bold;"><%= u.name %></td>
+                            <td style="padding: 15px; color: var(--text-muted);"><code><%= u.rfid_uid %></code></td>
+                            <td style="padding: 15px; color: #10b981; font-weight: bold;">$<%= u.balance.toFixed(2) %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head><title>Terminal</title></head>
+<body>
+    
+    <%- include('partials/nav') %>
+    <div style="padding: 30px; display: flex; gap: 20px;">
+        <div style="flex: 2;">
+            <h1>Bloom & Batter Terminal</h1>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;">
+                <% products.forEach(p => { %>
+                    <div class="glass-card" onclick="addToCart('<%= p.name %>', <%= p.price %>)" style="padding: 20px; text-align: center; cursor: pointer;">
+                        <div style="font-size: 3rem;"><%= p.icon %></div>
+                        <h3 style="margin: 10px 0 5px 0;"><%= p.name %></h3>
+                        <div style="color: var(--accent); font-weight: bold;">$<%= p.price.toFixed(2) %></div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <div class="glass-card" style="flex: 1; padding: 20px; height: fit-content; position: sticky; top: 20px;">
+            <h2>Current Order</h2>
+            <div id="cart-list"></div>
+            <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 15px;">
+                <div style="display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold;">
+                    <span>Total</span><span>$<span id="total-val">0.00</span></span>
+                </div>
+                <button id="pay-btn" onclick="openModal()" disabled style="width: 100%; margin-top: 15px; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; opacity: 0.5;">Scan Card</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:999; align-items:center; justify-content:center;">
+        <div class="glass-card" style="padding: 50px; text-align: center; width: 400px;">
+            <div id="modal-body">
+                <div style="font-size: 4rem;">📡</div>
+                <h2>Awaiting Tap...</h2>
+            </div>
+            <button onclick="location.reload()" style="background:none; border:none; color:gray; margin-top:20px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let cart = {};
+        function addToCart(name, price) {
+            if(!cart[name]) cart[name] = { price, qty: 0 };
+            cart[name].qty++; render();
+        }
+        function changeQty(name, d) {
+            cart[name].qty += d; if(cart[name].qty <= 0) delete cart[name]; render();
+        }
+        function render() {
+            const list = document.getElementById('cart-list');
+            let t = 0; list.innerHTML = '';
+            Object.keys(cart).forEach(name => {
+                const item = cart[name]; t += item.price * item.qty;
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span>${name}</span>
+                    <div>
+                        <button onclick="changeQty('${name}', -1)">-</button> <b>${item.qty}</b> <button onclick="changeQty('${name}', 1)">+</button>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('total-val').innerText = t.toFixed(2);
+            document.getElementById('pay-btn').disabled = t <= 0;
+            document.getElementById('pay-btn').style.opacity = t <= 0 ? 0.5 : 1;
+        }
+        function openModal() { document.getElementById('modal').style.display = 'flex'; }
+        
+        const ws = new WebSocket('ws://' + window.location.host);
+        ws.onmessage = async (e) => {
+            const data = JSON.parse(e.data);
+            if(document.getElementById('modal').style.display === 'flex') {
+                const res = await fetch('/checkout', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ uid: data.uid, total: document.getElementById('total-val').innerText, items: Object.keys(cart).join(", ") })
+                });
+                const result = await res.json();
+                if(result.success) {
+                    document.getElementById('modal-body').innerHTML = `<h2>✅ Success!</h2><p>Name: ${result.name}</p><p>New Balance: $${result.newBalance.toFixed(2)}</p>`;
+                    setTimeout(() => location.reload(), 3000);
+                } else { alert("Error or Insufficient Funds"); }
+            }
+        };
+    </script>
+</body>
+</html>
